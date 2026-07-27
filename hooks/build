@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+tag="${DOCKER_TAG:?Docker Hub must provide DOCKER_TAG}"
+image_name="${IMAGE_NAME:?Docker Hub must provide IMAGE_NAME}"
+distro="${tag%%-*}"
+tag_version="${tag#*-}"
+
+case "${distro}" in
+    debian) base_image="debian:13" ;;
+    ubuntu) base_image="ubuntu:24.04" ;;
+    fedora) base_image="fedora:44" ;;
+    rocky) base_image="rockylinux/rockylinux:9" ;;
+    almalinux) base_image="almalinux:9" ;;
+    opensuse) base_image="opensuse/tumbleweed:latest" ;;
+    *)
+        echo "Unsupported distribution in Docker tag: ${tag}" >&2
+        exit 1
+        ;;
+esac
+
+ghidra_version="${GHIDRA_VERSION:-${tag_version}}"
+if [[ "${tag_version}" != "${ghidra_version}" ]]; then
+    echo "DOCKER_TAG version (${tag_version}) and GHIDRA_VERSION (${ghidra_version}) differ" >&2
+    exit 1
+fi
+
+docker build \
+    --file "${DOCKERFILE_PATH:-Dockerfile.ghidra}" \
+    --build-arg "BASE_IMAGE=${base_image}" \
+    --build-arg "GHIDRA_VERSION=${ghidra_version}" \
+    --build-arg "GHIDRA_RELEASE_DATE=${GHIDRA_RELEASE_DATE:?Set GHIDRA_RELEASE_DATE in Docker Hub}" \
+    --build-arg "GHIDRA_SHA256=${GHIDRA_SHA256:-}" \
+    --tag "${image_name}" \
+    .

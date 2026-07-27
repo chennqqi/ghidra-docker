@@ -1,0 +1,59 @@
+# syntax=docker/dockerfile:1.7
+
+ARG GHIDRA_VERSION=12.1.2
+ARG GHIDRA_RELEASE_DATE=20260605
+ARG GHIDRA_SHA256
+ARG BASE_IMAGE=debian:13
+
+FROM debian:13-slim AS ghidra-download
+ARG GHIDRA_VERSION
+ARG GHIDRA_RELEASE_DATE
+ARG GHIDRA_SHA256
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+    && curl --fail --location --retry 3 \
+        "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_PUBLIC_${GHIDRA_RELEASE_DATE}.zip" \
+        --output /tmp/ghidra.zip \
+    && if [ -n "${GHIDRA_SHA256}" ]; then \
+         echo "${GHIDRA_SHA256}  /tmp/ghidra.zip" | sha256sum --check --strict -; \
+       fi \
+    && unzip -q /tmp/ghidra.zip -d /opt \
+    && mv "/opt/ghidra_${GHIDRA_VERSION}_PUBLIC" /opt/ghidra
+
+FROM ${BASE_IMAGE} AS runtime
+ARG GHIDRA_VERSION
+RUN if command -v apt-get >/dev/null; then \
+        apt-get update \
+        && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates openjdk-21-jdk \
+        && rm -rf /var/lib/apt/lists/*; \
+    elif command -v dnf >/dev/null; then \
+        . /etc/os-release; \
+        if [ "${ID}" = "fedora" ]; then \
+            java_package=java-25-openjdk-devel; \
+        else \
+            java_package=java-21-openjdk-devel; \
+        fi; \
+        dnf install -y ca-certificates "${java_package}" \
+        && dnf clean all; \
+    elif command -v zypper >/dev/null; then \
+        zypper --non-interactive refresh \
+        && zypper --non-interactive install --no-recommends \
+            ca-certificates java-21-openjdk-devel \
+        && zypper clean --all; \
+    else \
+        echo "Unsupported base image package manager" >&2; \
+        exit 1; \
+    fi
+
+LABEL org.opencontainers.image.title="Ghidra" \
+      org.opencontainers.image.description="Parameterized Ghidra environment" \
+      org.opencontainers.image.source="https://github.com/chennqqi/ghidra-docker" \
+      org.opencontainers.image.version="${GHIDRA_VERSION}"
+
+ENV GHIDRA_INSTALL_DIR=/opt/ghidra \
+    GHIDRA_HOME=/opt/ghidra
+COPY --from=ghidra-download /opt/ghidra /opt/ghidra
+
+WORKDIR /workspace
+ENTRYPOINT ["/opt/ghidra/ghidraRun"]
