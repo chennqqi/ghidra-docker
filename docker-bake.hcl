@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "IMAGE_NAME" {
-  default = "chennqqi/ghidra"
+  default = "sort/ghidra"
 }
 
 variable "GHIDRA_VERSION" {

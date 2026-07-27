@@ -14,7 +14,19 @@
 | `almalinux` | AlmaLinux 9 | `almalinux-12.1.2` |
 | `opensuse` | openSUSE Tumbleweed | `opensuse-12.1.2` |
 
-镜像名默认为 `docker.io/chennqqi/ghidra`，可通过 Bake 变量覆盖。
+镜像发布在 [Docker Hub：sort/ghidra](https://hub.docker.com/r/sort/ghidra)，
+完整镜像名为 `docker.io/sort/ghidra`。
+
+拉取所需发行版镜像：
+
+```sh
+docker pull sort/ghidra:ubuntu-12.1.2
+docker pull sort/ghidra:debian-12.1.2
+docker pull sort/ghidra:fedora-12.1.2
+docker pull sort/ghidra:rocky-12.1.2
+docker pull sort/ghidra:almalinux-12.1.2
+docker pull sort/ghidra:opensuse-12.1.2
+```
 
 ## 构建
 
@@ -77,7 +89,9 @@ docker build \
 2. `Settings → Secrets and variables → Actions → Secrets` 新增
    `DOCKERHUB_TOKEN`，值为具有目标仓库 Read & Write 权限的 Docker Hub
    Personal Access Token。
-3. 确保 Docker Hub 中存在 `${DOCKERHUB_USERNAME}/ghidra` 仓库。
+3. 确保该账户对
+   [Docker Hub：sort/ghidra](https://hub.docker.com/r/sort/ghidra)
+   仓库具有写入权限。
 
 合并 Ghidra 版本更新 PR 后，工作流会自动发布六个新的
 `<发行版>-<Ghidra版本>` 标签。各发行版使用独立的 GitHub Actions BuildKit
@@ -96,7 +110,7 @@ docker run --rm \
   --env DISPLAY \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume "$PWD:/workspace" \
-  docker.io/chennqqi/ghidra:debian-12.1.2
+  sort/ghidra:debian-12.1.2
 ```
 
 执行无头分析时覆盖入口：
@@ -105,7 +119,7 @@ docker run --rm \
 docker run --rm \
   --entrypoint /opt/ghidra/support/analyzeHeadless \
   --volume "$PWD:/workspace" \
-  docker.io/chennqqi/ghidra:debian-12.1.2 \
+  sort/ghidra:debian-12.1.2 \
   /workspace/projects example -import /workspace/example.bin
 ```
 
