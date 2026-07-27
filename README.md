@@ -64,30 +64,24 @@ docker build \
 发行版版本直接通过 `BASE_IMAGE` 覆盖；只要基础镜像使用 APT、DNF 或 Zypper
 并提供 OpenJDK 21，即可复用同一个 Dockerfile。
 
-## Docker Hub 自动构建
+## GitHub Actions 发布到 Docker Hub
 
-在 Docker Hub 仓库的 Build configurations 中为每个目标建立一条规则。所有
-规则使用仓库根目录作为 Build context，Dockerfile path 均为
-`Dockerfile.ghidra`。仓库内的 `hooks/build` 会根据目标 Docker tag 自动提取
-发行版和 Ghidra 版本，因此分别设置：
+`.github/workflows/build-images.yml` 在 `main` 分支的镜像配置发生变化时运行，
+也支持手动触发。工作流使用六任务矩阵并行构建各发行版，通过 Bake 中的标签
+直接推送到 Docker Hub。
 
-| Docker tag | 对应发行版 |
-| --- | --- |
-| `debian-12.1.2` | Debian |
-| `ubuntu-12.1.2` | Ubuntu |
-| `fedora-12.1.2` | Fedora |
-| `rocky-12.1.2` | Rocky Linux |
-| `almalinux-12.1.2` | AlmaLinux |
-| `opensuse-12.1.2` | openSUSE |
+在 GitHub 仓库中配置：
 
-在 Build environment variables 中设置 `GHIDRA_RELEASE_DATE=20260605`，可选
-设置 `GHIDRA_SHA256`。`GHIDRA_VERSION` 默认直接取
-Docker tag 中系统名后的部分；如果显式设置，它必须与 tag 一致。Docker Hub
-连接 GitHub 后，提交或合并版本更新 PR 即可触发这些构建。若希望保留旧版本，
-新增对应标签的规则，不要覆盖已有版本标签。
+1. `Settings → Secrets and variables → Actions → Variables` 新增
+   `DOCKERHUB_USERNAME`，值为 Docker Hub 用户名或组织名。
+2. `Settings → Secrets and variables → Actions → Secrets` 新增
+   `DOCKERHUB_TOKEN`，值为具有目标仓库 Read & Write 权限的 Docker Hub
+   Personal Access Token。
+3. 确保 Docker Hub 中存在 `${DOCKERHUB_USERNAME}/ghidra` 仓库。
 
-Docker Hub 已宣布 Automated Builds 将于 2027-04-01 完全退役。当前连接可以
-继续使用，但应在退役前迁移到 GitHub Actions Buildx 并推送至 Docker Hub。
+合并 Ghidra 版本更新 PR 后，工作流会自动发布六个新的
+`<发行版>-<Ghidra版本>` 标签。各发行版使用独立的 GitHub Actions BuildKit
+缓存。
 
 ## 运行
 
