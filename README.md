@@ -1,5 +1,154 @@
 # Ghidra Docker
 
+**English** | [中文](#中文)
+
+Ghidra container images on multiple mainstream Linux distributions. All
+distributions share the same `Dockerfile.ghidra`; upgrading Ghidra usually
+only requires adjusting build arguments.
+
+## Support Matrix
+
+| Target | Base image | Image tag |
+| --- | --- | --- |
+| `debian` | Debian 13 | `debian-12.1.2` |
+| `ubuntu` | Ubuntu 24.04 | `ubuntu-12.1.2` |
+| `fedora` | Fedora 44 | `fedora-12.1.2` |
+| `rocky` | Rocky Linux 9 | `rocky-12.1.2` |
+| `almalinux` | AlmaLinux 9 | `almalinux-12.1.2` |
+| `opensuse` | openSUSE Tumbleweed | `opensuse-12.1.2` |
+
+Images are published to [Docker Hub: sort/ghidra](https://hub.docker.com/r/sort/ghidra);
+the full image name is `docker.io/sort/ghidra`.
+
+Pull the image for the distribution you need:
+
+```sh
+docker pull sort/ghidra:ubuntu-12.1.2
+docker pull sort/ghidra:debian-12.1.2
+docker pull sort/ghidra:fedora-12.1.2
+docker pull sort/ghidra:rocky-12.1.2
+docker pull sort/ghidra:almalinux-12.1.2
+docker pull sort/ghidra:opensuse-12.1.2
+```
+
+## Building
+
+Build a single distribution:
+
+```sh
+docker buildx bake debian
+```
+
+Build all distributions:
+
+```sh
+docker buildx bake
+```
+
+Override the image name and Ghidra version:
+
+```sh
+REGISTRY=docker.io \
+IMAGE_NAME=example/ghidra \
+GHIDRA_VERSION=12.1.2 \
+GHIDRA_RELEASE_DATE=20260605 \
+docker buildx bake
+```
+
+You can also build the Dockerfile directly:
+
+```sh
+docker build \
+  --file Dockerfile.ghidra \
+  --build-arg BASE_IMAGE=ubuntu:24.04 \
+  --build-arg GHIDRA_VERSION=12.1.2 \
+  --build-arg GHIDRA_RELEASE_DATE=20260605 \
+  --tag example/ghidra:ubuntu-12.1.2 \
+  .
+```
+
+Available build arguments:
+
+| Argument | Default | Purpose |
+| --- | --- | --- |
+| `BASE_IMAGE` | `debian:13` | Select the base distribution image |
+| `GHIDRA_VERSION` | `12.1.2` | Ghidra version |
+| `GHIDRA_RELEASE_DATE` | `20260605` | Date in the official ZIP filename |
+| `GHIDRA_SHA256` | empty | Optional SHA-256 of the official ZIP |
+
+Distribution versions are selected by overriding `BASE_IMAGE`. As long as the
+base image uses APT, DNF, or Zypper and provides OpenJDK 21, the same
+Dockerfile can be reused.
+
+## Publishing to Docker Hub via GitHub Actions
+
+`.github/workflows/build-images.yml` runs when image configuration changes on
+the `main` branch and also supports manual dispatch. The workflow builds all
+distributions in a six-job matrix and pushes the tags defined in Bake directly
+to Docker Hub.
+
+Configure the following in the GitHub repository:
+
+1. `Settings → Secrets and variables → Actions → Variables`: add
+   `DOCKERHUB_USERNAME` with your Docker Hub username or organization name.
+2. `Settings → Secrets and variables → Actions → Secrets`: add
+   `DOCKERHUB_TOKEN` with a Docker Hub Personal Access Token that has
+   Read & Write permission on the target repository.
+3. Make sure the account has write access to
+   [Docker Hub: sort/ghidra](https://hub.docker.com/r/sort/ghidra).
+
+After a Ghidra version bump PR is merged, the workflow automatically
+publishes six new `<distro>-<ghidra-version>` tags. Each distribution uses
+its own GitHub Actions BuildKit cache.
+
+## Running
+
+The default entrypoint is the official Ghidra launcher
+`/opt/ghidra/ghidraRun`. To run the GUI, provide the container with the host
+display environment, for example Linux X11.
+
+The image sets both `GHIDRA_INSTALL_DIR=/opt/ghidra` and the compatibility
+variable `GHIDRA_HOME=/opt/ghidra`.
+
+```sh
+docker run --rm \
+  --env DISPLAY \
+  --volume /tmp/.X11-unix:/tmp/.X11-unix \
+  --volume "$PWD:/workspace" \
+  sort/ghidra:debian-12.1.2
+```
+
+For headless analysis, override the entrypoint:
+
+```sh
+docker run --rm \
+  --entrypoint /opt/ghidra/support/analyzeHeadless \
+  --volume "$PWD:/workspace" \
+  sort/ghidra:debian-12.1.2 \
+  /workspace/projects example -import /workspace/example.bin
+```
+
+## Automated Ghidra Release Check
+
+`.github/workflows/check-ghidra-release.yml` queries the official Ghidra
+repository for the latest release every Monday. When a new version is
+detected, it extracts the version and release date from the official asset
+name, updates the Dockerfile and Bake defaults, and opens a PR. The
+repository must allow GitHub Actions to create pull requests:
+
+`Settings → Actions → General → Workflow permissions → Allow GitHub Actions
+to create and approve pull requests`.
+
+Release source: [NationalSecurityAgency/ghidra Releases](https://github.com/NationalSecurityAgency/ghidra/releases).
+
+---
+
+<a id="中文"></a>
+
+# Ghidra Docker（中文）
+
+[English](#ghidra-docker) | **中文**
+
 基于多个主流 Linux 发行版的 Ghidra 镜像。所有发行版
 共享同一个 `Dockerfile.ghidra`，Ghidra 升级通常只需调整构建参数。
 
