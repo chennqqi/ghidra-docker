@@ -7,15 +7,15 @@ variable "IMAGE_NAME" {
 }
 
 variable "GHIDRA_VERSION" {
-  default = "12.1.2"
+  default = "12.1.4"
 }
 
 variable "GHIDRA_RELEASE_DATE" {
-  default = "20260605"
+  default = "20260921"
 }
 
 variable "GHIDRA_SHA256" {
-  default = ""
+  default = "ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db"
 }
 
 group "default" {
