@@ -35,7 +35,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -C "${branch}"
-          git add Dockerfile.ghidra docker-bake.hcl
+          git add Dockerfile.ghidra docker-bake.hcl README.md
           git commit -m "chore: update Ghidra to ${version}"
           git push --force origin "${branch}"
           if ! gh pr view "${branch}" >/dev/null 2>&1; then

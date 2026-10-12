@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: dockerhub-${{ github.ref }}
@@ -56,3 +56,18 @@ jobs:
           set: |
             ${{ matrix.target }}.cache-from=type=gha,scope=${{ matrix.target }}
             ${{ matrix.target }}.cache-to=type=gha,mode=max,scope=${{ matrix.target }}
+
+  release:
+    name: Create GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/ghidra
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/create-release.sh

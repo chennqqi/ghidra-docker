@@ -39,6 +39,7 @@ digest="$(jq -r --arg name "${asset_name}" '
 sha256="${digest#sha256:}"
 
 current_version="$(sed -n 's/^ARG GHIDRA_VERSION=//p' "${repo_root}/Dockerfile.ghidra")"
+current_release_date="$(sed -n 's/^ARG GHIDRA_RELEASE_DATE=//p' "${repo_root}/Dockerfile.ghidra")"
 if [[ "${version}" == "${current_version}" ]]; then
     echo "Ghidra ${version} is already configured"
     exit 0
@@ -57,5 +58,13 @@ if [[ "${sha256}" =~ ^[0-9a-fA-F]{64}$ ]]; then
     sed -i "/variable \"GHIDRA_SHA256\"/,/}/{s/default = .*/default = \"${sha256}\"/;}" \
         "${repo_root}/docker-bake.hcl"
 fi
+
+# README.md documents image tags, build-arg defaults and examples that embed
+# the version and release date; keep them in sync with the Dockerfile.
+current_version_pattern="${current_version//./\\.}"
+sed -i \
+    -e "s/${current_version_pattern}/${version}/g" \
+    -e "s/${current_release_date}/${release_date}/g" \
+    "${repo_root}/README.md"
 
 echo "Updated Ghidra ${current_version} to ${version} (${release_date})"
