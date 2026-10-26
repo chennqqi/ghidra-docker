@@ -10,12 +10,12 @@ only requires adjusting build arguments.
 
 | Target | Base image | Image tag |
 | --- | --- | --- |
-| `debian` | Debian 13 | `debian-12.1.4` |
-| `ubuntu` | Ubuntu 24.04 | `ubuntu-12.1.4` |
-| `fedora` | Fedora 44 | `fedora-12.1.4` |
-| `rocky` | Rocky Linux 9 | `rocky-12.1.4` |
-| `almalinux` | AlmaLinux 9 | `almalinux-12.1.4` |
-| `opensuse` | openSUSE Tumbleweed | `opensuse-12.1.4` |
+| `debian` | Debian 13 | `debian-12.2` |
+| `ubuntu` | Ubuntu 24.04 | `ubuntu-12.2` |
+| `fedora` | Fedora 44 | `fedora-12.2` |
+| `rocky` | Rocky Linux 9 | `rocky-12.2` |
+| `almalinux` | AlmaLinux 9 | `almalinux-12.2` |
+| `opensuse` | openSUSE Tumbleweed | `opensuse-12.2` |
 
 Images are published to [Docker Hub: sort/ghidra](https://hub.docker.com/r/sort/ghidra);
 the full image name is `docker.io/sort/ghidra`.
@@ -23,12 +23,12 @@ the full image name is `docker.io/sort/ghidra`.
 Pull the image for the distribution you need:
 
 ```sh
-docker pull sort/ghidra:ubuntu-12.1.4
-docker pull sort/ghidra:debian-12.1.4
-docker pull sort/ghidra:fedora-12.1.4
-docker pull sort/ghidra:rocky-12.1.4
-docker pull sort/ghidra:almalinux-12.1.4
-docker pull sort/ghidra:opensuse-12.1.4
+docker pull sort/ghidra:ubuntu-12.2
+docker pull sort/ghidra:debian-12.2
+docker pull sort/ghidra:fedora-12.2
+docker pull sort/ghidra:rocky-12.2
+docker pull sort/ghidra:almalinux-12.2
+docker pull sort/ghidra:opensuse-12.2
 ```
 
 ## Building
@@ -50,8 +50,8 @@ Override the image name and Ghidra version:
 ```sh
 REGISTRY=docker.io \
 IMAGE_NAME=example/ghidra \
-GHIDRA_VERSION=12.1.4 \
-GHIDRA_RELEASE_DATE=20260921 \
+GHIDRA_VERSION=12.2 \
+GHIDRA_RELEASE_DATE=20261016 \
 docker buildx bake
 ```
 
@@ -61,9 +61,9 @@ You can also build the Dockerfile directly:
 docker build \
   --file Dockerfile.ghidra \
   --build-arg BASE_IMAGE=ubuntu:24.04 \
-  --build-arg GHIDRA_VERSION=12.1.4 \
-  --build-arg GHIDRA_RELEASE_DATE=20260921 \
-  --tag example/ghidra:ubuntu-12.1.4 \
+  --build-arg GHIDRA_VERSION=12.2 \
+  --build-arg GHIDRA_RELEASE_DATE=20261016 \
+  --tag example/ghidra:ubuntu-12.2 \
   .
 ```
 
@@ -72,8 +72,8 @@ Available build arguments:
 | Argument | Default | Purpose |
 | --- | --- | --- |
 | `BASE_IMAGE` | `debian:13` | Select the base distribution image |
-| `GHIDRA_VERSION` | `12.1.4` | Ghidra version |
-| `GHIDRA_RELEASE_DATE` | `20260921` | Date in the official ZIP filename |
+| `GHIDRA_VERSION` | `12.2` | Ghidra version |
+| `GHIDRA_RELEASE_DATE` | `20261016` | Date in the official ZIP filename |
 | `GHIDRA_SHA256` | empty | Optional SHA-256 of the official ZIP |
 
 Distribution versions are selected by overriding `BASE_IMAGE`. As long as the
@@ -115,7 +115,7 @@ docker run --rm \
   --env DISPLAY \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume "$PWD:/workspace" \
-  sort/ghidra:debian-12.1.4
+  sort/ghidra:debian-12.2
 ```
 
 For headless analysis, override the entrypoint:
@@ -124,7 +124,7 @@ For headless analysis, override the entrypoint:
 docker run --rm \
   --entrypoint /opt/ghidra/support/analyzeHeadless \
   --volume "$PWD:/workspace" \
-  sort/ghidra:debian-12.1.4 \
+  sort/ghidra:debian-12.2 \
   /workspace/projects example -import /workspace/example.bin
 ```
 
@@ -156,12 +156,12 @@ Release source: [NationalSecurityAgency/ghidra Releases](https://github.com/Nati
 
 | 构建目标 | 基础镜像 | 镜像标签 |
 | --- | --- | --- |
-| `debian` | Debian 13 | `debian-12.1.4` |
-| `ubuntu` | Ubuntu 24.04 | `ubuntu-12.1.4` |
-| `fedora` | Fedora 44 | `fedora-12.1.4` |
-| `rocky` | Rocky Linux 9 | `rocky-12.1.4` |
-| `almalinux` | AlmaLinux 9 | `almalinux-12.1.4` |
-| `opensuse` | openSUSE Tumbleweed | `opensuse-12.1.4` |
+| `debian` | Debian 13 | `debian-12.2` |
+| `ubuntu` | Ubuntu 24.04 | `ubuntu-12.2` |
+| `fedora` | Fedora 44 | `fedora-12.2` |
+| `rocky` | Rocky Linux 9 | `rocky-12.2` |
+| `almalinux` | AlmaLinux 9 | `almalinux-12.2` |
+| `opensuse` | openSUSE Tumbleweed | `opensuse-12.2` |
 
 镜像发布在 [Docker Hub：sort/ghidra](https://hub.docker.com/r/sort/ghidra)，
 完整镜像名为 `docker.io/sort/ghidra`。
@@ -169,12 +169,12 @@ Release source: [NationalSecurityAgency/ghidra Releases](https://github.com/Nati
 拉取所需发行版镜像：
 
 ```sh
-docker pull sort/ghidra:ubuntu-12.1.4
-docker pull sort/ghidra:debian-12.1.4
-docker pull sort/ghidra:fedora-12.1.4
-docker pull sort/ghidra:rocky-12.1.4
-docker pull sort/ghidra:almalinux-12.1.4
-docker pull sort/ghidra:opensuse-12.1.4
+docker pull sort/ghidra:ubuntu-12.2
+docker pull sort/ghidra:debian-12.2
+docker pull sort/ghidra:fedora-12.2
+docker pull sort/ghidra:rocky-12.2
+docker pull sort/ghidra:almalinux-12.2
+docker pull sort/ghidra:opensuse-12.2
 ```
 
 ## 构建
@@ -196,8 +196,8 @@ docker buildx bake
 ```sh
 REGISTRY=docker.io \
 IMAGE_NAME=example/ghidra \
-GHIDRA_VERSION=12.1.4 \
-GHIDRA_RELEASE_DATE=20260921 \
+GHIDRA_VERSION=12.2 \
+GHIDRA_RELEASE_DATE=20261016 \
 docker buildx bake
 ```
 
@@ -207,9 +207,9 @@ docker buildx bake
 docker build \
   --file Dockerfile.ghidra \
   --build-arg BASE_IMAGE=ubuntu:24.04 \
-  --build-arg GHIDRA_VERSION=12.1.4 \
-  --build-arg GHIDRA_RELEASE_DATE=20260921 \
-  --tag example/ghidra:ubuntu-12.1.4 \
+  --build-arg GHIDRA_VERSION=12.2 \
+  --build-arg GHIDRA_RELEASE_DATE=20261016 \
+  --tag example/ghidra:ubuntu-12.2 \
   .
 ```
 
@@ -218,8 +218,8 @@ docker build \
 | 参数 | 默认值 | 用途 |
 | --- | --- | --- |
 | `BASE_IMAGE` | `debian:13` | 选择基础发行版镜像 |
-| `GHIDRA_VERSION` | `12.1.4` | Ghidra 版本 |
-| `GHIDRA_RELEASE_DATE` | `20260921` | 官方 ZIP 文件名中的日期 |
+| `GHIDRA_VERSION` | `12.2` | Ghidra 版本 |
+| `GHIDRA_RELEASE_DATE` | `20261016` | 官方 ZIP 文件名中的日期 |
 | `GHIDRA_SHA256` | 空 | 可选的官方 ZIP SHA-256 |
 
 发行版版本直接通过 `BASE_IMAGE` 覆盖；只要基础镜像使用 APT、DNF 或 Zypper
@@ -259,7 +259,7 @@ docker run --rm \
   --env DISPLAY \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume "$PWD:/workspace" \
-  sort/ghidra:debian-12.1.4
+  sort/ghidra:debian-12.2
 ```
 
 执行无头分析时覆盖入口：
@@ -268,7 +268,7 @@ docker run --rm \
 docker run --rm \
   --entrypoint /opt/ghidra/support/analyzeHeadless \
   --volume "$PWD:/workspace" \
-  sort/ghidra:debian-12.1.4 \
+  sort/ghidra:debian-12.2 \
   /workspace/projects example -import /workspace/example.bin
 ```
 
